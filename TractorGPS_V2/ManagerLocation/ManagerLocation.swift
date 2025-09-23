@@ -18,12 +18,11 @@ class ManagerLocation: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var currentOperation: OperationType = .harvesting
     @Published var customWidth: Double?
     @Published var isTracking = false
-
     // Stats Properties
     @Published var currentSpeed: Double = 0
     @Published var totalDistance: Double = 0
     @Published var coveredArea: Double = 0
-    private var lastLocation: CLLocation?
+    public var lastLocation: CLLocation?
 
     // Guidance
     @Published var pointA: CLLocationCoordinate2D?
@@ -38,9 +37,10 @@ class ManagerLocation: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     // Authorization Status
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
-
+    @Published var didCheckPermission: Bool = false
     override init() {
         super.init()
+        checkAuthorization()
         setupLocationManager()
     }
 
@@ -109,7 +109,19 @@ class ManagerLocation: NSObject, ObservableObject, CLLocationManagerDelegate {
             locationManager.startUpdatingHeading()
         }
     }
-
+    func checkAuthorization() {
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .restricted, .denied:
+            didCheckPermission = true
+        case .authorizedAlways, .authorizedWhenInUse:
+            didCheckPermission = true
+        @unknown default:
+            didCheckPermission = true
+        }
+    }
+    
     func requestPermission() {
         locationManager.requestAlwaysAuthorization()
     }
@@ -118,7 +130,7 @@ class ManagerLocation: NSObject, ObservableObject, CLLocationManagerDelegate {
     var isLocationAuthorized: Bool {
         return authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse
     }
-
+  
     func toggleTracking() {
         isTracking.toggle()
         if isTracking {
@@ -139,6 +151,7 @@ class ManagerLocation: NSObject, ObservableObject, CLLocationManagerDelegate {
             totalDistance = 0
             coveredArea = 0
             lastLocation = nil
+           
         }
     }
 
@@ -181,6 +194,7 @@ class ManagerLocation: NSObject, ObservableObject, CLLocationManagerDelegate {
     // MARK: - Authorization Delegate
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
+        checkAuthorization()
         switch authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             manager.startUpdatingLocation()
@@ -496,7 +510,6 @@ extension ManagerLocation {
 extension ManagerLocation {
     private func updateLiveActivity() {
         guard isTracking else { return }
-
         // Find the closest guidance line and get its heading
         if let currentLocation = location?.coordinate {
             var closestDistance = Double.infinity
@@ -531,5 +544,28 @@ extension ManagerLocation {
                 shouldTurnLeft: shouldTurnLeft
             )
         }
+    }
+}
+extension ManagerLocation {
+    /// Tổng thời gian session hiện tại (giây)
+    func currentSessionDuration() -> TimeInterval {
+        let session = trackingSessions.last ?? []
+        guard let first = session.first?.timestamp, let last = session.last?.timestamp else { return 0 }
+        return last.timeIntervalSince(first)
+    }
+
+    /// Elevation Gain (nếu TrackPoint có altitude)
+    func currentSessionElevationGain() -> Double {
+        let session = trackingSessions.last ?? []
+        var gain: Double = 0
+        var lastAlt: Double?
+        for p in session {
+            let alt = p.coordinate.latitude
+            if let prev = lastAlt, alt > prev {
+                gain += (alt - prev)
+            }
+            lastAlt = alt
+        }
+        return gain
     }
 }

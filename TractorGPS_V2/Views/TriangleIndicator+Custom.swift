@@ -73,28 +73,65 @@ class TriangleIndicator: NSObject, MKOverlay {
 }
 
 class TriangleOverlayRenderer: MKOverlayRenderer {
-    override func draw(_: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
-        guard let overlay = overlay as? TriangleIndicator else { return }
-
+    override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
+//        guard let overlay = overlay as? TriangleIndicator else { return }
+//
+//        // Convert overlay coordinate to CGPoint
+//        let centerPoint = point(for: MKMapPoint(overlay.coordinate))
+//
+//        // Lấy SF Symbol
+//        guard let uiImage = UIImage(named: "ic_cursor"),
+//              let cgImage = uiImage.cgImage else {
+//            return
+//        }
+//
+//        let rect = CGRect(
+//            x: centerPoint.x - uiImage.size.width / 2,
+//            y: centerPoint.y - uiImage.size.height / 2,
+//            width: uiImage.size.width,
+//            height: uiImage.size.height
+//        )
+//
+//        context.saveGState()
+//
+//        // Shadow
+//        context.setShadow(offset: CGSize(width: 0, height: 2),
+//                          blur: 8,
+//                          color: UIColor.black.withAlphaComponent(0.5).cgColor)
+//
+//        // Xoay quanh center
+//        context.translateBy(x: rect.midX, y: rect.midY)
+//        context.rotate(by: CGFloat(overlay.heading * .pi / 180))
+//        context.translateBy(x: -rect.midX, y: -rect.midY)
+//
+//        // Vẽ ảnh vào context
+//        context.draw(cgImage, in: rect)
+//
+//        context.restoreGState()
+        
+        guard let overlay = self.overlay as? TriangleIndicator else { return }
+        
         // Convert coordinates to points using renderer's point(for:) method
         let points = overlay.getTriangleCoordinates().map { coordinate -> CGPoint in
             return self.point(for: MKMapPoint(coordinate))
         }
-
+        
         context.setFillColor(overlay.color.withAlphaComponent(0.3).cgColor)
         context.setStrokeColor(overlay.color.cgColor)
         context.setLineWidth(2.0 / zoomScale)
-
+        
         let path = CGMutablePath()
         path.move(to: points[0])
         path.addLine(to: points[1])
         path.addLine(to: points[2])
         path.closeSubpath()
-
+        
         context.addPath(path)
         context.drawPath(using: .fillStroke)
     }
 }
+
+
 
 class CustomOverlay: NSObject, MKOverlay {
     let coordinate: CLLocationCoordinate2D
@@ -239,8 +276,8 @@ class CustomOverlayRenderer: MKOverlayRenderer {
         guard points.count >= 4 else { return }
 
         // Draw filled polygon
-        context.setFillColor(overlay.type.color.withAlphaComponent(0.3).cgColor)
-        context.setStrokeColor(overlay.type.color.withAlphaComponent(0.5).cgColor)
+        context.setFillColor(overlay.type.color.withAlphaComponent(0.7).cgColor)
+        context.setStrokeColor(overlay.type.color.withAlphaComponent(0.7).cgColor)
         // context.setLineWidth(1.0 / zoomScale)
 
         let path = CGMutablePath()
@@ -257,4 +294,44 @@ class CustomOverlayRenderer: MKOverlayRenderer {
 
 class GuidanceLineOverlay: MKPolyline {
     var isActiveLine = false
+}
+extension CGMutablePath {
+    func addRoundedTriangle(points: [CGPoint], cornerRadius: CGFloat) {
+        guard points.count == 3 else { return }
+
+        // Lặp qua 3 cạnh
+        for i in 0..<3 {
+            let prev = points[(i + 2) % 3]
+            let current = points[i]
+            let next = points[(i + 1) % 3]
+
+            // Vector hướng
+            let v1 = CGPoint(x: current.x - prev.x, y: current.y - prev.y)
+            let v2 = CGPoint(x: current.x - next.x, y: current.y - next.y)
+
+            let v1Length = hypot(v1.x, v1.y)
+            let v2Length = hypot(v2.x, v2.y)
+
+            // Điểm bo góc
+            let p1 = CGPoint(
+                x: current.x - v1.x / v1Length * cornerRadius,
+                y: current.y - v1.y / v1Length * cornerRadius
+            )
+            let p2 = CGPoint(
+                x: current.x - v2.x / v2Length * cornerRadius,
+                y: current.y - v2.y / v2Length * cornerRadius
+            )
+
+            if i == 0 {
+                move(to: p1)
+            } else {
+                addLine(to: p1)
+            }
+
+            // Bo góc bằng arc
+            addQuadCurve(to: p2, control: current)
+        }
+
+        closeSubpath()
+    }
 }

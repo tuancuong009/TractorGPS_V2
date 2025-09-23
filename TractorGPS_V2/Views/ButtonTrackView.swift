@@ -11,78 +11,96 @@ import SwiftUI
 struct ButtonTrackView: View {
     @ObservedObject var locationManager: ManagerLocation
     @Binding var region: MKCoordinateRegion
-
+    
     var formattedAcres: String {
         let acres = locationManager.coveredArea.toAcres()
         return String(format: "%.2f", acres)
     }
-
+    
     @Binding var operationType: OperationType
-
+    var onStop: () -> Void
     var body: some View {
-        VStack(spacing: 5) {
-            // Status Text
-            Text(locationManager.isTracking ? "TRACKING" : "READY")
-                .font(.system(.caption, design: .rounded))
-                .fontWeight(.bold)
-                .foregroundColor(locationManager.isTracking ? .green : .white)
-
-            // Main Track Button
+        
+        HStack(spacing: 12) {
+            // Resume / Pause button
+            if locationManager.isTracking{
+                Color.clear.frame(width: 38, height: 76)
+            }
             Button(action: {
                 locationManager.toggleTracking()
                 if locationManager.isTracking {
                     zoomToUser()
                 }
             }) {
-                ZStack {
-                    // Outer circle
-                    Circle()
-                        .fill(Color.black.opacity(0.7))
-                        .frame(width: 55, height: 55)
-
-                    // Inner circle with glow
-                    Circle()
-                        .fill(locationManager.isTracking ? Color.red : Color.green)
-                        .frame(width: 55, height: 55)
-                        .shadow(color: locationManager.isTracking ? .red : .green, radius: 10)
-
-                    // Icon
-                    Image(systemName: locationManager.isTracking ? "stop.fill" : "play.fill")
+                
+                HStack {
+                    Image(systemName: !locationManager.isTracking ? "play.fill" : "pause.fill") .font(AppFonts.semiBold(size: 20))
+                        .foregroundColor(.white)
+                    Text(!locationManager.isTracking ? "Resume" : "Pause")
+                        .foregroundColor(.white)
+                        .font(AppFonts.semiBold(size: 20))
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 76)
+                .background(!locationManager.isTracking ? Color.init(hex: "00B846") : Color.init(hex: "0088FF"))
+                .clipShape(Capsule())
+                .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 3)
+                
+            }.overlay( // Viền
+                Capsule()
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(0.6),
+                                .white.opacity(0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            )
+            
+            // Stop button
+            if !locationManager.isTracking{
+                Button(action: {
+                    print("Stop tapped")
+                    onStop()
+                }) {
+                    Image("btn_stop")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 30, height: 30)
+                        .frame(width: 24, height: 24)
                         .foregroundColor(.white)
-                        .offset(x: locationManager.isTracking ? 0 : 2.5)
-                }
+                        .frame(width: 76, height: 76)
+                        .background(Color.red)
+                        .clipShape(Circle())
+                        .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 3)
+                }.overlay( // Viền
+                    Capsule()
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    .white.opacity(0.6),
+                                    .white.opacity(0.1)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
             }
-
-            // Acres Counter
-            VStack(spacing: 2) {
-                Text(formattedAcres)
-                    .font(.system(.title3, design: .rounded))
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-
-                Text("acres \(operationType)")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                    .padding(.horizontal)
+            else{
+                Color.clear.frame(width: 38, height: 76)
             }
-            .padding(.vertical, 8)
-            // .frame(maxWidth: 200)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.black.opacity(0.3))
-            )
+          
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color.black.opacity(0.6))
-                .shadow(radius: 10)
-        )
+        .frame(maxWidth: .infinity)
+        
+        
     }
-
+    
     private func zoomToUser() {
         if let location = locationManager.location {
             withAnimation {

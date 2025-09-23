@@ -18,6 +18,7 @@ struct Toolbar: View {
     @Binding var isNight: Bool
     @Binding var operationType: OperationType
     @Binding var mapType: MKMapType
+    @EnvironmentObject var themeManager: ThemeManager
     
     var locationButtonImage: String {
         switch userTrackingMode {
@@ -45,20 +46,20 @@ struct Toolbar: View {
                     } label: {
                         Image(systemName: mapType == .standard ? "map" : "map.fill")
                             .padding()
-                            .foregroundStyle(mapType == .standard ? .blue : .white)
-                            .background(mapType == .standard ? Color.white : Color.blackish)
+                            .foregroundStyle(mapType == .standard ? AppTheme.primary : AppTheme.textPrimary)
+                            .background(mapType == .standard ? AppTheme.surface : AppTheme.surfaceSecondary)
                             .clipShape(Circle())
                     }
                     
                     Button {
                         withAnimation(.easeInOut) {
-                            isNight.toggle()
+                            themeManager.toggleTheme()
                         }
                     } label: {
-                        Image(systemName: "moon.fill")
+                        Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.fill")
                             .padding()
-                            .foregroundStyle(isNight ? .white : .blue)
-                            .background(isNight ? Color.blackish : Color.white)
+                            .foregroundStyle(themeManager.isDarkMode ? .black : .white)
+                            .background(themeManager.isDarkMode ? AppTheme.surface : AppTheme.primary)
                             .clipShape(Circle())
                     }
                 }
@@ -67,7 +68,7 @@ struct Toolbar: View {
                 Button(action: centerOnUser) {
                     Image(systemName: "location.fill")
                         .padding()
-                        .background(Color.blue)
+                        .background(AppTheme.primary)
                         .clipShape(Circle())
                         .shadow(radius: 4)
                 }.tint(.white)
@@ -83,7 +84,7 @@ struct Toolbar: View {
                 } label: {
                     Image(systemName: locationManager.currentOperation.icon)
                         .padding()
-                        .background(Color.white)
+                        .background(AppTheme.surface)
                         .clipShape(Circle())
                         .shadow(radius: 4)
                 }
@@ -93,7 +94,7 @@ struct Toolbar: View {
                 Button(action: { showingWidthPicker.toggle() }) {
                     Image(systemName: "ruler")
                         .padding()
-                        .background(Color.white)
+                        .background(AppTheme.surface)
                         .clipShape(Circle())
                         .shadow(radius: 4)
                 }
@@ -101,7 +102,7 @@ struct Toolbar: View {
                 Button(action: { locationManager.clearCurrentSession() }) {
                     Image(systemName: "trash")
                         .padding()
-                        .background(Color.red)
+                        .background(AppTheme.error)
                         .clipShape(Circle())
                         .shadow(radius: 4)
                 }.tint(.white)

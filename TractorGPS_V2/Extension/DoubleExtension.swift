@@ -19,4 +19,7 @@ extension Double {
         // 1 square meter = 0.0001 hectares
         return self * 0.0001
     }
+    
+    var feetToMeters: Double { self * 0.3048 }
+    var metersToFeet: Double { self / 0.3048 }
 }

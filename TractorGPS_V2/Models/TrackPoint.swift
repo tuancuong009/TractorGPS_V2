@@ -25,12 +25,21 @@ enum OperationType: String, CaseIterable {
     case seeding = "Seeding"
     case spraying = "Spraying"
 
+//    var color: Color {
+//        switch self {
+//        case .harvesting: return AppTheme.harvesting
+//        case .plowing: return AppTheme.plowing
+//        case .seeding: return AppTheme.seeding
+//        case .spraying: return AppTheme.spraying
+//        }
+//    }
+    
     var color: UIColor {
         switch self {
-        case .harvesting: return .green
-        case .plowing: return .brown
-        case .seeding: return .blue
-        case .spraying: return .red
+        case .harvesting: return UIColor(AppTheme.harvesting)
+        case .plowing: return UIColor(AppTheme.plowing)
+        case .seeding: return UIColor(AppTheme.seeding)
+        case .spraying: return UIColor(AppTheme.spraying)
         }
     }
 
