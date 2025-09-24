@@ -41,7 +41,7 @@ struct ContentView: View {
                 MapViewKit(locationManager: locationManager,
                            region: $region,
                            userTrackingMode: $userTrackingMode,
-                           mapType: $mapType)
+                           mapType: $mapType, points: $points)
                 .edgesIgnoringSafeArea(.all)
                 if isStart{
                     VStack {
@@ -147,8 +147,6 @@ struct ContentView: View {
                    
                 }
                 
-                
-                //Toolbar(locationManager: locationManager, region: $region, userTrackingMode: $userTrackingMode, isNight: $isNight, operationType: $operationType, mapType: $mapType)
             })
             .sheet(isPresented: $showSetTarget) {
                 SetAreaCoverageView(initialRegion: region,

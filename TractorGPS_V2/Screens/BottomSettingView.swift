@@ -22,9 +22,50 @@ struct PreSettingsView: View {
             // Khung chính
             VStack(spacing: 0) {
                 
+               
+                
+                HStack {
+                    HStack{
+                        Image("icType")
+                        Text("Farming Type").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
+                    }
+                    Spacer()
+                    Menu {
+                        
+                        ForEach(OperationType.allCases, id: \.self) { type in
+                            Button(action: {
+                                locationManager.currentOperation = type
+                                operationType = type
+                            }) {
+                                HStack {
+                                    if operationType.rawValue == type.rawValue{
+                                        
+                                        Text("✓ " + type.rawValue).font(AppFonts.regular(size: 17))
+                                    }
+                                    else{
+                                        Text("‎ ‎ ‎ ‎ " + type.rawValue).font(AppFonts.regular(size: 17))
+                                    }
+                                    Spacer()
+                                    Image(systemName: type.icon)
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack{
+                            Text(operationType.rawValue).font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textTertiary)
+                            Image("dropdown") .foregroundColor(AppTheme.textTertiary)
+                        }
+                    }
+                    
+                    
+                    
+                }
+                .padding()
+                
+                Divider()
                 // Farming Type
                 HStack {
-                    VStack{
+                    VStack(spacing: 2){
                         HStack{
                             Image("trackingwidth")
                             Text("Coverage").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
@@ -32,7 +73,7 @@ struct PreSettingsView: View {
                         }
                         HStack{
                             Text("0%")
-                                .font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
+                                .font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textTertiary)
                             Spacer()
                         }
                         
@@ -52,40 +93,10 @@ struct PreSettingsView: View {
                 .padding()
                 
                 Divider()
-                HStack {
-                    HStack{
-                        Image("icType")
-                        Text("Farming Type").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                    }
-                    Spacer()
-                    Menu {
-                        ForEach(OperationType.allCases, id: \.self) { type in
-                            Button(action: {
-                                locationManager.currentOperation = type
-                                operationType = type
-                            }) {
-                                HStack{
-                                    Label(type.rawValue, systemImage: type.icon)
-                                }
-                            }
-                        }
-                    } label: {
-                        HStack{
-                            Text(operationType.rawValue).font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textTertiary)
-                            Image("dropdown") .foregroundColor(AppTheme.textTertiary)
-                        }
-                    }
-                    
-                    
-                    
-                }
-                .padding()
-                
-                Divider()
                 
                 // Track Width
                 HStack {
-                    VStack{
+                    VStack(spacing: 2){
                         HStack{
                             Image("icTracking")
                             Text("Track Width").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
@@ -100,23 +111,26 @@ struct PreSettingsView: View {
                     }
                     
                     Spacer()
-                    
-                    HStack(spacing: 0) {
-                        Button(action: onDecrease) {
-                            Image("Decrement").foregroundColor(AppTheme.textPrimary)
-                        }.frame(width: 46)
-                        Divider().frame(height: 36).padding(.vertical, 5)
-                        Button(action: onIncrease) {
-                            Image("Increment").foregroundColor(AppTheme.textPrimary)
-                        }.frame(width: 46)
+                    VStack{
+                        HStack(spacing: 5) {
+                            ScaleButton(icon: "Decrement") {
+                                onDecrease()
+                            }.padding(.leading, 10)
+                            Divider().frame(height: 24).padding(.vertical, 2)
+                            ScaleButton(icon: "Increment") {
+                                onIncrease()
+                            }.padding(.trailing, 10)
+                        }
+                        .background(UITraitCollection.current.userInterfaceStyle == .dark ? Color(hex: "787880").opacity(0.24) : Color(hex: "787880").opacity(0.12))
+                        .clipShape(Capsule())
+                        
                     }
-                    .padding(.leading, 8)
-                    .background(AppTheme.border.opacity(0.08))
-                    .clipShape(Capsule())
+                  
                 }
-                .padding()
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
             }
-            .background(AppTheme.surfaceSecondary)
+            .background(UITraitCollection.current.userInterfaceStyle == .dark ? Color(hex: "1C1C1E") : Color(hex: "F2F2F7"))
             .cornerRadius(12)
             Button {
                 onStart()

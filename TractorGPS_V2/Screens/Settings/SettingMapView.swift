@@ -80,24 +80,27 @@ struct SettingMapView: View {
                     }
 
                     Spacer()
-
-                    HStack(spacing: 0) {
-                        ScaleButton(icon: "Decrement") {
-                            if trackWidth > 1 {
-                                trackWidth -= 1
-                                locationManager.customWidth = Double(trackWidth)
-                            }
+                    VStack{
+                        HStack(spacing: 10) {
+                            ScaleButton(icon: "Decrement") {
+                                if trackWidth > 1 {
+                                    trackWidth -= 1
+                                    locationManager.customWidth = Double(trackWidth)
+                                }
+                            }.padding(.leading, 5)
+                            Divider().frame(height: 24).padding(.vertical, 2)
+                            ScaleButton(icon: "Increment") {
+                                if trackWidth < 30 {
+                                    trackWidth += 1
+                                    locationManager.customWidth = Double(trackWidth)
+                                }
+                            }.padding(.trailing, 5)
                         }
-                        Divider().frame(height: 36).padding(.vertical, 5)
-                        ScaleButton(icon: "Increment") {
-                            if trackWidth < 30 {
-                                trackWidth += 1
-                                locationManager.customWidth = Double(trackWidth)
-                            }
-                        }
+                        .background(UITraitCollection.current.userInterfaceStyle == .dark ? Color(hex: "787880").opacity(0.24) : Color(hex: "787880").opacity(0.12))
+                        .cornerRadius(8)
+                        
                     }
-                    .background(AppTheme.border.opacity(0.08))
-                    .clipShape(Capsule())
+                   
                 }
             }
           
@@ -158,8 +161,9 @@ struct ScaleButton: View {
         }) {
             Image(icon)
                 .foregroundColor(AppTheme.textPrimary)
-                .frame(width: 46, height: 46)
+                .frame(width: 32, height: 32)
                 .scaleEffect(isPressed ? 1.2 : 1.0) // 👈 hiệu ứng nhấn
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain) // tránh bị Section override
     }

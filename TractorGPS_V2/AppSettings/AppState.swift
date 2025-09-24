@@ -1,17 +1,32 @@
 //
 //  AppState.swift
-//  TractorGPS_V2
+//  dummytractor
 //
-//  Created by QTS Coder on 16/9/25.
+//  Created by MacBook on 19/12/2024.
 //
 
-
-import SwiftUI
+import Foundation
+import Combine
 
 class AppState: ObservableObject {
-    @Published var hasAccess: Bool
+    @Published var hasAccess: Bool = false
+    private var cancellables = Set<AnyCancellable>()
     
     init() {
-        self.hasAccess = UserDefaults.isPremium
+        // Lắng nghe thay đổi từ PremiumManager.shared.isPremium
+        Task {
+            await PremiumManager.shared.$isPremium
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.hasAccess, on: self)
+                .store(in: &cancellables)
+        }
+        
+        Task {
+            await PremiumManager.shared.checkPremiumStatus()
+        }
+       
+        
+        // Check lại trạng thái khi app khởi động
+       
     }
 }

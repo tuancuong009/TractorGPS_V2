@@ -13,11 +13,11 @@ struct SetAreaCoverageView: View {
     @EnvironmentObject var themeManager: ThemeManager
     
     @State private var region: MKCoordinateRegion
-    @Binding var points: [CLLocationCoordinate2D]      // dữ liệu thật
+    @Binding var points: [CLLocationCoordinate2D]
     @Binding var mapType: MKMapType
     @Binding var focusUser: Bool
     
-    @State private var localPoints: [CLLocationCoordinate2D] = [] // dữ liệu tạm
+    @State private var localPoints: [CLLocationCoordinate2D] = []
     @State private var undoStack: [MapAction] = []
     @State private var redoStack: [MapAction] = []
     @State private var areaHa: String = "0.00"
@@ -32,6 +32,11 @@ struct SetAreaCoverageView: View {
         _mapType = mapType
         _focusUser = focusUser
     }
+    
+    // MARK: - Computed properties
+    private var isUndoEnabled: Bool { !undoStack.isEmpty }
+    private var isRedoEnabled: Bool { !redoStack.isEmpty }
+    private var isDoneEnabled: Bool { !localPoints.isEmpty }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -55,17 +60,19 @@ struct SetAreaCoverageView: View {
             
             // Map
             ZStack(alignment: .topTrailing) {
-                MapRepresentable(region: $region,
-                                 points: $localPoints,   // 👈 dùng localPoints thay vì points
-                                 mapType: $mapType,
-                                 focusUser: focusUser,
-                                 onAddPoint: { coord in
-                    touchHelp = true
-                    localPoints.append(coord)
-                    undoStack.append(.add(coord))
-                    redoStack.removeAll()
-                    recalcArea()
-                })
+                MapRepresentable(
+                    region: $region,
+                    points: $localPoints,
+                    mapType: $mapType,
+                    focusUser: focusUser,
+                    onAddPoint: { coord in
+                        touchHelp = true
+                        localPoints.append(coord)
+                        undoStack.append(.add(coord))
+                        redoStack.removeAll()
+                        recalcArea()
+                    }
+                )
                 .edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing: 0) {
@@ -90,10 +97,14 @@ struct SetAreaCoverageView: View {
                             Spacer()
                             Text("Tap the screen to add points and create polygon")
                                 .font(AppFonts.regular(size: 15))
-                                .foregroundColor(AppTheme.textPrimary)
+                                .foregroundColor(Color.white)
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 5)
-                                .background(AppTheme.surfaceSecondary.opacity(0.9))
+                                .background(
+                                    UITraitCollection.current.userInterfaceStyle == .dark
+                                    ? Color.black.opacity(0.5)
+                                    : Color(hex: "1B1F26").opacity(0.72)
+                                )
                                 .cornerRadius(8)
                             Spacer()
                         }
@@ -128,7 +139,9 @@ struct SetAreaCoverageView: View {
                         }
                     } label: {
                         Image("icClose")
+                            .opacity(isDoneEnabled ? 1.0 : 0.3)
                     }
+                    .disabled(!isDoneEnabled)
                     
                     // Undo
                     Button {
@@ -149,8 +162,9 @@ struct SetAreaCoverageView: View {
                             recalcArea()
                         }
                     } label: {
-                        Image("back_tap") // undo
+                        Image(isUndoEnabled ? "back_tap2": "back_tap")
                     }
+                    .disabled(!isUndoEnabled)
                     
                     // Redo
                     Button {
@@ -171,32 +185,34 @@ struct SetAreaCoverageView: View {
                             recalcArea()
                         }
                     } label: {
-                        Image("next_tap") // redo
+                        Image(isRedoEnabled ? "next_tap2": "next_tap")
                     }
+                    .disabled(!isRedoEnabled)
                     
                     // Done
                     Button {
-                        points = localPoints   // 👈 chỉ khi bấm Done mới cập nhật ra ngoài
+                        points = localPoints
                         dismiss()
                     } label: {
                         Text("Done")
                             .font(AppFonts.medium(size: 15))
-                            .foregroundColor(.white)
+                            .foregroundColor(isDoneEnabled ? .white : Color(hex: "8E8E93"))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(AppTheme.primary)
+                            .background(isDoneEnabled ? AppTheme.primary : Color(hex: "F2F2F7"))
                             .clipShape(Capsule())
-                            .frame(width: 65, height: 34, alignment: .center)
+                            .frame(width: 65, height: 34)
+                            .opacity(isDoneEnabled ? 1.0 : 0.3)
                     }
+                    .disabled(!isDoneEnabled)
                     .padding(.trailing, 10)
                 }
             }
             .padding(.vertical, 10)
             .background(AppTheme.background)
-            //.cornerRadius(12)
         }
         .onAppear {
-            localPoints = points   // 👈 copy dữ liệu gốc vào local khi mở
+            localPoints = points
             recalcArea()
         }
         .onChange(of: mapType) { newValue in
@@ -216,14 +232,13 @@ struct SetAreaCoverageView: View {
     private func calculateAreaHa() -> String {
         guard localPoints.count > 2 else { return "0.00" }
         let area = polygonArea(points: localPoints)
-        return String(format: "%.2f", area / 10000) // m² → ha
+        return String(format: "%.2f", area / 10000)
     }
     
-    /// Tính diện tích polygon trên mặt đất (m²)
     private func polygonArea(points: [CLLocationCoordinate2D]) -> Double {
         guard points.count > 2 else { return 0 }
         
-        let radius: Double = 6_378_137 // bán kính Trái Đất (m)
+        let radius: Double = 6_378_137
         var area: Double = 0
         
         for i in 0..<points.count {
@@ -239,7 +254,7 @@ struct SetAreaCoverageView: View {
         }
         
         area = -(area * radius * radius / 2.0)
-        return abs(area) // diện tích dương
+        return abs(area)
     }
 }
 

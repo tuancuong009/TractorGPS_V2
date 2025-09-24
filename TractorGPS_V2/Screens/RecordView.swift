@@ -14,7 +14,8 @@ import MapKit
 
 struct RecordView: View {
     @StateObject private var locationManager = ManagerLocation()
-    var region: MKCoordinateRegion
+    @State var region: MKCoordinateRegion
+    
     var coordinates: [CLLocationCoordinate2D]
     var time: String
     var coverArea: String
@@ -77,11 +78,11 @@ struct RecordView: View {
                 onDone()
             }) {
                 Text("Done")
-                    .font(AppFonts.regular(size: 15))
+                    .font(AppFonts.medium(size: 17))
                     .foregroundColor(AppTheme.primary)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .padding(.vertical, 5)
+                    .padding(.vertical, 6)
                     .background(AppTheme.surfaceSecondary)
                     .cornerRadius(12)
             }
@@ -89,9 +90,46 @@ struct RecordView: View {
             .padding(.bottom, 20)
         }
         .onAppear {
+            if coordinates.count > 0{
+                region = makeRegion(from: coordinates)
+            }
             print("POINTS--->",region)
         }
         .themeAware()
+    }
+    
+    private func makeRegion(from coords: [CLLocationCoordinate2D]) -> MKCoordinateRegion {
+        guard !coords.isEmpty else {
+            return MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            )
+        }
+        
+        var minLat = coords.first!.latitude
+        var maxLat = coords.first!.latitude
+        var minLon = coords.first!.longitude
+        var maxLon = coords.first!.longitude
+        
+        for c in coords {
+            minLat = min(minLat, c.latitude)
+            maxLat = max(maxLat, c.latitude)
+            minLon = min(minLon, c.longitude)
+            maxLon = max(maxLon, c.longitude)
+        }
+        
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+        
+        let latDelta = max(0.001, (maxLat - minLat) * 1.5)
+        let lonDelta = max(0.001, (maxLon - minLon) * 1.5)
+        
+        return MKCoordinateRegion(
+            center: center,
+            span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
+        )
     }
 }
 

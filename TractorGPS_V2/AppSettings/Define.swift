@@ -17,8 +17,6 @@ struct Constants {
     struct UserDefaultsKeys {
         static let PRO_VERSION = "proVersion"
     }
+    static let apiKey = "app_BURMCx8WxPzHEHr9e4kMo2916dBm2t"
 }
 
-struct SettingConfig{
-  
-}

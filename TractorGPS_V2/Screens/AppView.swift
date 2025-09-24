@@ -7,21 +7,23 @@
 
 import SwiftUI
 struct AppView: View {
-    @State private var showWelcome = false
+    //@State private var showWelcome = false
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         NavigationStack{
-            if showWelcome {
-                WelcomeView()
-                    .transition(.move(edge: .trailing))
-            } else {
-                SplashScreen {
-                    withAnimation {
-                        showWelcome = true
-                    }
-                }
-            }
+//            if showWelcome {
+//                WelcomeView()
+//                    .transition(.move(edge: .trailing))
+//            } else {
+//                SplashScreen {
+//                    withAnimation {
+//                        showWelcome = true
+//                    }
+//                }
+//            }
+            WelcomeView()
+                .transition(.move(edge: .trailing))
         }
         .themeAware()
     }

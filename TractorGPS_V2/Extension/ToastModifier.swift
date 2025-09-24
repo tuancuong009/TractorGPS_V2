@@ -17,6 +17,14 @@ struct ToastModifier: ViewModifier {
                               backgroundColor: backgroundColor)
                         .transition(.move(edge: .top).combined(with: .opacity)) // ⬅️ trượt + mờ dần
                         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: isShowing)
+                        .onAppear {
+                            // Tự động ẩn sau 2s
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    isShowing = false
+                                }
+                            }
+                        }
                 }
                 Spacer()
             }

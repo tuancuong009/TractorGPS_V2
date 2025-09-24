@@ -46,16 +46,14 @@ struct DataView: View {
     
     private func makeHighlightedAttributedString(full: String, highlight: String) -> AttributedString? {
         let ns = NSMutableAttributedString(string: full, attributes: [
-            .font: UIFont(name: "SFProText-Light", size: 16) ?? UIFont.systemFont(ofSize: 14),
-            .foregroundColor: UIColor(AppTheme.textPrimary)
+            .font: UIFont(name: "SFProText-Light", size: 16) ?? UIFont.systemFont(ofSize: 14)
         ])
         
         let range = (full as NSString).range(of: highlight)
         if range.location != NSNotFound {
             ns.addAttributes([
                 .font: UIFont(name: "SFProText-Medium", size: 16) ?? UIFont.systemFont(ofSize: 14),
-                .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .foregroundColor: UIColor(AppTheme.primary)
+                .underlineStyle: NSUnderlineStyle.single.rawValue
             ], range: range)
         }
         

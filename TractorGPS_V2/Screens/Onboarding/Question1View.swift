@@ -125,7 +125,7 @@ struct OptionCard: View {
             }
             .padding()
             .frame(maxWidth: .infinity, minHeight: 120)
-            .background(AppTheme.surface)
+            .background(AppTheme.surfaceBox)
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)

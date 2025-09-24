@@ -8,6 +8,7 @@
 
 import SwiftUI
 import StoreKit
+import ApphudSDK
 struct SettingsView: View {
     @StateObject private var locationManager = ManagerLocation()
     @StateObject private var safariManager = SafariManager.shared
@@ -23,13 +24,13 @@ struct SettingsView: View {
                         HStack(spacing: 20){
                             Image("st_map")
                             Text("Map").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                        }.padding(.vertical, 5)
+                        }.padding(.vertical, 4)
                     }
                     NavigationLink(destination: SettingUnitView()) {
                         HStack(spacing: 20){
                             Image("st_unit")
                             Text("Units").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                        }.padding(.vertical, 5)
+                        }.padding(.vertical, 4)
                     }
                     
                     HStack(spacing: 20){
@@ -75,9 +76,9 @@ struct SettingsView: View {
                                 Image("dropdown") .foregroundColor(AppTheme.primary)
                             }
                         }
-                    }.padding(.vertical, 5)
+                    }.padding(.vertical, 4)
                     
-                }
+                }.listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 
                 Section {
                     Button(action: {
@@ -88,7 +89,7 @@ struct SettingsView: View {
                         HStack(spacing: 20){
                             Image("st_rate")
                             Text("Rate our App").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                        }.padding(.vertical, 5)
+                        }.padding(.vertical, 4)
                     }
                     
                     Button(action: {
@@ -102,9 +103,10 @@ struct SettingsView: View {
                         HStack(spacing: 20){
                             Image("st_share")
                             Text("Share App").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                        }.padding(.vertical, 5)
+                        }.padding(.vertical, 4)
                     }
                     Button(action: {
+                        
                         var versionStr = ""
                         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
                             versionStr = "\(version)"
@@ -122,7 +124,7 @@ struct SettingsView: View {
                                 <br>Platform: iOS
                                 <br>Device: \(UIDevice.current.modelName)
                                 <br>OS Version: \(UIDevice.current.systemVersion)
-                                <br>Language: English")
+                                <br>Language: English"
                             </span>
                             """
                         
@@ -139,10 +141,10 @@ struct SettingsView: View {
                         HStack(spacing: 20){
                             Image("st_contactus")
                             Text("Contact us").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                        }.padding(.vertical, 5)
+                        }.padding(.vertical, 4)
                     }
                     
-                }
+                }.listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 
                 Section {
                     
@@ -150,9 +152,9 @@ struct SettingsView: View {
                         HStack(spacing: 20){
                             Image("st_restore")
                             Text("Restore Purchases").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                        }.padding(.vertical, 5)
+                        }.padding(.vertical, 4)
                     }
-                }
+                }.listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 
                 Section {
                     Button(action: {
@@ -161,7 +163,7 @@ struct SettingsView: View {
                         HStack(spacing: 20){
                             Image("st_privacy")
                             Text("Privacy Policy").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                        }.padding(.vertical, 5)
+                        }.padding(.vertical, 4)
                     }
                     
                     Button(action: {
@@ -170,10 +172,10 @@ struct SettingsView: View {
                         HStack(spacing: 20){
                             Image("st_term")
                             Text("Terms of Service").font(AppFonts.regular(size: 17)).foregroundColor(AppTheme.textPrimary)
-                        }.padding(.vertical, 5)
+                        }.padding(.vertical, 4)
                     }
                     
-                }
+                }.listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 Section(footer:
                             VStack(alignment: .center, spacing: 4) {
                     if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,  let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
@@ -183,7 +185,7 @@ struct SettingsView: View {
                     }
                     
                     
-                    Text("ID: AD86DCC2-1FBD-4D5F-B404-0F9D303FBF89")
+                    Text("ID: \(Apphud.userID())")
                         .font(AppFonts.regular(size: 12))
                         .foregroundColor(.gray)
                         .multilineTextAlignment(.center)
@@ -198,7 +200,10 @@ struct SettingsView: View {
                 }
                 
             }
+            .listSectionSpacing(25)
+            .scrollIndicators(.hidden)
             .navigationTitle("Settings")
+          
             .padding(.bottom, safeInsets.bottom + 62)
             .sheet(isPresented: $manager.presentMailSheet, onDismiss: {
                 manager.mailData = nil

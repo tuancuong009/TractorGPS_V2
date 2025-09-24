@@ -25,7 +25,7 @@ struct ReasonsView: View {
     
     var body: some View {
         ZStack {
-            AppTheme.background.ignoresSafeArea()
+            AppTheme.backgroundQuestion.ignoresSafeArea()
             
             VStack {
                 VStack(alignment: .leading, spacing: 20) {
@@ -84,22 +84,25 @@ struct ReasonsView: View {
                     Text(attr)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding()
-                        .background(AppTheme.surfaceSecondary.opacity(0.3))
+                        .background(AppTheme.textPrimary.opacity(0.06))
                         .cornerRadius(8)
                 } else {
                     
                     Text(full)
                         .font(AppFonts.regular(size: 17))
                         .padding()
-                        .background(AppTheme.surfaceSecondary.opacity(0.3))
+                        .background(AppTheme.textPrimary.opacity(0.06))
                         .cornerRadius(8)
                 }
             } else {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(AppTheme.textPrimary)
-                Text(reasons[index])
-                    .font(AppFonts.regular(size: 17))
-                    .foregroundColor(AppTheme.textPrimary)
+                HStack(alignment: .center, spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(AppTheme.textPrimary)
+
+                    Text(reasons[index])
+                        .font(AppFonts.regular(size: 17))
+                        .foregroundColor(AppTheme.textPrimary)
+                }
             }
             
             Spacer()
@@ -109,16 +112,14 @@ struct ReasonsView: View {
     /// build NSMutableAttributedString then convert to AttributedString (safer for compiler)
     private func makeHighlightedAttributedString(full: String, highlight: String) -> AttributedString? {
         let ns = NSMutableAttributedString(string: full, attributes: [
-            .font: UIFont(name: "SFProText-Light", size: 14) ?? UIFont.systemFont(ofSize: 14),
-            .foregroundColor: UIColor(AppTheme.textPrimary)
+            .font: UIFont(name: "SFProText-Light", size: 14) ?? UIFont.systemFont(ofSize: 14)
         ])
         
         let range = (full as NSString).range(of: highlight)
         if range.location != NSNotFound {
             ns.addAttributes([
                 .font: UIFont(name: "SFProText-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14),
-                .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .foregroundColor: UIColor(AppTheme.primary)
+                .underlineStyle: NSUnderlineStyle.single.rawValue
             ], range: range)
         }
         

@@ -23,7 +23,7 @@ struct MainAppView: View {
             Group {
                 switch selectedTab {
                 case .map:
-                    ContentView(isStart: $isStart)  // truyền xuống ContentView
+                    ContentView(isStart: $isStart)
                 case .history:
                     HistoryView(isStart: $isStart)
                 case .settings:
@@ -32,7 +32,9 @@ struct MainAppView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppTheme.background.ignoresSafeArea())
-            
+            #if !os(macOS)
+                .modifier(HorizontalPaddingFix())
+            #endif
             // Custom TabBar (ẩn khi Start)
             if !isStart {
                 VStack(spacing: 0){
@@ -41,8 +43,8 @@ struct MainAppView: View {
                         .padding(.horizontal, 40)
                         .padding(.bottom, 12)
                 }
-                .background(AppTheme.surface)
-                .transition(.move(edge: .bottom))   // hiệu ứng ẩn/hiện
+                .background(selectedTab == .settings ? Color(uiColor: .systemGroupedBackground) :  AppTheme.surface)
+                .transition(.move(edge: .bottom))
                 .animation(.easeInOut, value: isStart)
             }
         }
@@ -59,13 +61,12 @@ struct CustomTabBar: View {
             // Capsule Border
             Image("bg_tabbar")
             HStack(spacing: 0) {
-                tabButton(tab: .map, title: "Map", select: "tab_home", selected: "tab_home1")
-                tabButton(tab: .history, title: "History", select: "tab_history", selected: "tab_history1")
-                tabButton(tab: .settings, title: "Settings", select: "tab_setting", selected: "tab_setting1")
+                tabButton(tab: .map, title: "Map", select: "tab_home", selected: "tab_home")
+                tabButton(tab: .history, title: "History", select: "tab_history", selected: "tab_history")
+                tabButton(tab: .settings, title: "Settings", select: "tab_st", selected: "tab_st")
             }
             .padding(6)
-            .padding(.horizontal, 30)
-            .padding(.top, 2)
+            .padding(.horizontal, 24)
         }
        
     }
@@ -75,17 +76,17 @@ struct CustomTabBar: View {
             selectedTab = tab
         }) {
             VStack(spacing: 4) {
-                Image(selectedTab == tab ? selected : select)
+                Image(selectedTab == tab ? selected : select).foregroundColor(selectedTab == tab ? AppTheme.primary : AppTheme.textSecondary)
                 Text(title)
                     .font(AppFonts.medium(size: 10))
                     .foregroundColor(selectedTab == tab ? AppTheme.primary : AppTheme.textSecondary)
             }
-            .frame(maxWidth: .infinity) // 👉 full chiều ngang
+            .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .background(
                 Group {
                     if selectedTab == tab {
-                        AppTheme.surfaceSecondary
+                        AppTheme.selectTabbar
                             .clipShape(Capsule())
                     } else {
                         Color.clear

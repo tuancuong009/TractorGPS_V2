@@ -62,6 +62,7 @@ struct AppTheme {
     static let backgroundQuestion = Color("BackgroundQuestion")
     static let backgroundSecondary = Color("BackgroundSecondary")
     static let backgroundTertiary = Color("BackgroundTertiary")
+    static let selectTabbar = Color("selectTabbar")
     
     // Text Colors
     static let textPrimary = Color("TextPrimary")
@@ -70,6 +71,8 @@ struct AppTheme {
     
     // Surface Colors
     static let surface = Color("Surface")
+    static let surfaceBox = Color("SurfaceBox")
+    
     static let surfaceSecondary = Color("SurfaceSecondary")
     static let surfaceSecondary2 = Color("SurfaceSecondary2")
     static let surfaceTertiary = Color("SurfaceTertiary")

@@ -177,6 +177,7 @@ struct HistoryView: View {
                     }
                 }
             }
+            
             .navigationDestination(isPresented: Binding(
                 get: { selectedRecord != nil },
                 set: { isActive in
@@ -201,7 +202,7 @@ struct HistoryView: View {
                 }
                 Button("Cancel", role: .cancel) { }
             } message: {
-                Text("Are you sure you want to delete these records? This action can not be undone")
+                Text("Are you sure you want to delete these records? This action can not be undo")
             }
         }
     }

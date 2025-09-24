@@ -61,7 +61,7 @@ struct Question2View: View {
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(AppTheme.surface)
+                    .background(AppTheme.surfaceBox)
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)

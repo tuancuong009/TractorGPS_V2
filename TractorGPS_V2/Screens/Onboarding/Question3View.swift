@@ -118,7 +118,7 @@ struct OptionRow: View {
                 Image(isSelected ? "ticked" : "untick")
             }
             .padding()
-            .background(AppTheme.surface)
+            .background(AppTheme.surfaceBox)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
