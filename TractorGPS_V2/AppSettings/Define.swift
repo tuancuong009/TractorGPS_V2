@@ -8,10 +8,10 @@
 import Foundation
 struct AppSettings{
     static let APP_NAME =  "FieldTrac"
-    static let PRIVACY = "https://www.google.com"
-    static let TERMS = "https://www.google.com"
-    static let EMAIL = "support@gmail.com"
-    static let APP_ID = ""
+    static let PRIVACY = "https://www.tractorgps.app/privacy"
+    static let TERMS = "https://www.tractorgps.app/terms"
+    static let EMAIL = "support@tractorgps.app"
+    static let APP_ID = "id6738772331"
 }
 struct Constants {
     struct UserDefaultsKeys {
